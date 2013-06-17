@@ -24,15 +24,34 @@ end
 
 y = log(s_jt) - log(s_o)
 x = x2
-z = [x iv]
+r = [2: 21]
+z = iv(:,r)
+
+beta_ols = ols (y, x)
+error = y - x * beta_ols
+sse = error' * error
+s2 = sse / (n_brand * n_market)
+var = inv(x' * x) * s2
+se_ols = sqrt(diag(var))
+
+
+x_hat = z * inv(z' * z) * z' * x
+beta_iv = inv(x_hat' * x) * (x_hat' * y)
+error = y - x_hat * beta_iv
+sse = error' * error
+s2 = sse / (n_brand * n_market)
+var = inv(x_hat' * x_hat) * s2
+se_iv = sqrt(diag(var))
+
 
 diary on
-
 disp("Question 1")
 
-[beta_ols, sigma_ols] = ols (y, x)
-[beta_iv, sigma_iv] = ols (y, z)
+beta_ols
+se_ols
 
+beta_iv
+se_iv
 diary off
 
 
@@ -63,7 +82,14 @@ s_g = s_0 + s_1
 
 y = log(s_jt) - log(s_o)
 x = [x s_g]
-z = [x iv]
+
+x_hat = z * inv(z' * z) * z' * x
+beta = inv(x_hat' * x) * (x_hat' * y)
+error = y - x_hat * beta
+sse = error' * error
+s2 = sse / (n_brand * n_market)
+var = inv(x_hat' * x_hat) * s2
+se = sqrt(diag(var))
 
 diary on
 
@@ -71,7 +97,8 @@ disp(" ")
 disp("----------")
 disp("Question 2")
 
-[beta, sigma] = ols (y, z)
+beta
+se
 
 diary off
 
